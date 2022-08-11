@@ -23,6 +23,14 @@ class BeerClientImplTest {
         beerClient = new BeerClientImpl(new WebClientConfig().webClient());
     }
 
+    private BeerDto getBeerDto() {
+        Mono<BeerPagedList> beerPagedListMono = beerClient.listBeers(null, null, null, null, null);
+        BeerPagedList beerPagedList = beerPagedListMono.block();
+        BeerDto beer = beerPagedList.getContent().get(0);
+
+        return beer;
+    }
+
     @Test
     void listBeers() {
         Mono<BeerPagedList> beerPagedListMono = beerClient.listBeers(null, null, null, null, null);
@@ -122,13 +130,11 @@ class BeerClientImplTest {
 
     @Test
     void deleteBeer() {
-    }
+        BeerDto beerDto = getBeerDto();
 
-    private BeerDto getBeerDto() {
-        Mono<BeerPagedList> beerPagedListMono = beerClient.listBeers(null, null, null, null, null);
-        BeerPagedList beerPagedList = beerPagedListMono.block();
-        BeerDto beer = beerPagedList.getContent().get(0);
+        Mono<ResponseEntity<Void>> responseEntityMono = beerClient.deleteBeer(beerDto.getId());
+        ResponseEntity<Void> response = responseEntityMono.block();
 
-        return beer;
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 }
