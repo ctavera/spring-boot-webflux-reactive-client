@@ -6,7 +6,11 @@ import da.springframework.springbootwebfluxreactiveclient.model.BeerPagedList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Mono;
+
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -94,6 +98,17 @@ class BeerClientImplTest {
 
     @Test
     void createNewBeer() {
+        BeerDto beerDto = BeerDto.builder()
+                .beerName("Dogfishhead 90 Min IPA")
+                .beerStyle("IPA")
+                .upc("23156468954656")
+                .price(new BigDecimal("10.99"))
+                .build();
+
+        Mono<ResponseEntity<Void>> responseEntityMono = beerClient.createNewBeer(beerDto);
+        ResponseEntity response = responseEntityMono.block();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 
     @Test
